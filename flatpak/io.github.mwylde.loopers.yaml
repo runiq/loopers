@@ -1,0 +1,32 @@
+app-id: "io.github.mwylde.loopers"
+runtime: "org.freedesktop.Platform"
+runtime-version: "23.08"
+sdk: "org.freedesktop.Sdk"
+sdk-extensions:
+  - "org.freedesktop.Sdk.Extension.rust-stable"
+command: loopers
+finish-args:
+  - "--share=ipc"
+  - "--socket=fallback-x11"
+  - "--socket=wayland"
+  - "--device=dri"
+  - "--filesystem=xdg-run/pipewire-0"
+build-options:
+  append-path: "/usr/lib/sdk/rust-stable/bin"
+  env:
+    CARGO_HOME: "/run/build/loopers/cargo"
+    SKIA_BINARIES_URL: "file:///run/build/loopers/skia-binaries-03ef1ef138b5870c26b8-x86_64-unknown-linux-gnu-gl-x11.tar.gz"
+modules:
+  - name: loopers
+    buildsystem: simple
+    build-commands:
+      - "cargo --offline fetch --manifest-path Cargo.toml"
+      - "cargo --offline build --release"
+      - "install -Dm755 target/release/loopers -t /app/bin/"
+    sources:
+      - "cargo-sources.json"
+      - type: file
+        url: "https://github.com/rust-skia/skia-binaries/releases/download/0.69.0/skia-binaries-03ef1ef138b5870c26b8-x86_64-unknown-linux-gnu-gl-x11.tar.gz"
+        sha256: "fe91bfea32dc7666521ad90568f0c256c01b1722bb4d47cf6c165aed39d7668e"
+      - type: dir
+        path: ".."
